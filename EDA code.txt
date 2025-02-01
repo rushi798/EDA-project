@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('Customer Churn.csv')
+df.head()
+print(df)
+print(df.columns)
+
+"""(['customerID', 'gender', 'SeniorCitizen', 'Partner', 'Dependents',
+       'tenure', 'PhoneService', 'MultipleLines', 'InternetService',
+       'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport',
+       'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling',
+       'PaymentMethod', 'MonthlyCharges', 'TotalCharges', 'Churn'],
+      dtype='object')"""
+
+print(df.info())
+print()
+
+df["TotalCharges"] = df["TotalCharges"].replace(" ","0")
+df["TotalCharges"] = df["TotalCharges"].astype("float")
+print(df)
+
+df.info()
+print()
+df.isnull().sum().sum()
+print(df)
+
+df.describe()
+print(df)
+
+df["customerID"].duplicated().sum()
+print(df)
+
+"""def conv(value):
+    if value == 1:
+        return "yes"
+    else:
+        return "no"
+
+df['SeniorCitizen'] = df["SeniorCitizen"].apply(conv)
+print(df)"""
+
+categorical_cols = ['PhoneService', 'MultipleLines','Contract','PaperlessBilling',
+       'PaymentMethod']
+for col in categorical_cols:
+    plt.figure(figsize=(8, 4))
+    value_counts = df[col].value_counts()
+    plt.bar(value_counts.index, value_counts.values, color='green')
+    plt.title(f"Distribution of {col}")
+    plt.xlabel(col)
+    plt.ylabel("Count")
+    plt.show()
+
+plt.figure(figsize = (3,4))
+gb = df.groupby('InternetService').agg({'InternetService':"count"})
+plt.pie(gb['InternetService'], labels = gb.index)
+cmap = plt.get_cmap("viridis")
+plt.title("Percentage of Churned Customers", fontsize = 10)
+plt.show()
+
+plt.figure(figsize = (3,3))
+sns.countplot(x = "gender", data = df, hue = "Churn")
+plt.title("Churn by Gender")
+plt.show()
+
+plt.figure(figsize = (4,4))
+ax = sns.countplot(x =  'Partner', data = df,color='red')
+plt.title("Count of Customers by partner",color='Yellow')
+plt.show()
+
+plt.figure(figsize = (9,4))
+sns.histplot(x = "tenure", data = df, bins = 72, hue = "Churn")
+plt.show()
+
+numerical_cols = ['MonthlyCharges', 'TotalCharges','tenure']
+for col in numerical_cols:
+    plt.figure(figsize=(8, 4))
+    sns.histplot(df[col], kde=True,color='orange')
+    plt.title(f"Distribution of {col}",color='green')
+    plt.show()
